@@ -74,7 +74,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   newsletterWebhookUrl: "",
 
   // 👉 SENHA DO ADMINISTRADOR PARA ACESSAR "CONFIGURAR LINKS":
-  adminPassword: "Mr748197/",
+  adminPassword: (import.meta.env && import.meta.env.VITE_ADMIN_PASSWORD) || "Mr748197/",
 
   // 👉 IMAGENS DO CARROSSEL DO HERO (Google Fotos / URLs de Imagem)
   heroImages: [
