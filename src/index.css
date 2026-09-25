@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --gold-100: #fef7da;
+    --gold-200: #fae69e;
+    --gold-300: #f4cf60;
+    --gold-400: #e8b931;
+    --gold-500: #d4af37;
+    --gold-600: #b5891e;
+    --gold-700: #8c6313;
+    --navy-950: #050811;
+    --navy-900: #0a0f1d;
+    --navy-850: #0f1629;
+    --navy-800: #151e36;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--navy-950);
+    color: #f1f5f9;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-luxury {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .font-brand-cinzel {
+    font-family: 'Cinzel', serif;
+  }
+}
+
+/* Luxury metallic gold effects */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FFF0CA 0%, #E3BC52 35%, #D4AF37 55%, #9E7418 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-gradient-text-bright {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF3D1 30%, #E5BD56 70%, #C9982E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border-glow {
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 25px -5px rgba(212, 175, 55, 0.2);
+}
+
+.gold-button-gradient {
+  background: linear-gradient(135deg, #f7d77b 0%, #d4af37 40%, #c49622 75%, #a47610 100%);
+  color: #1a1202;
+  box-shadow: 0 10px 30px -5px rgba(212, 175, 55, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gold-button-gradient:hover {
+  background: linear-gradient(135deg, #ffdf88 0%, #deb841 40%, #cf9f27 75%, #b58315 100%);
+  box-shadow: 0 14px 40px -4px rgba(212, 175, 55, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.gold-button-secondary {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #e5bd56;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.gold-button-secondary:hover {
+  background: rgba(212, 175, 55, 0.18);
+  border-color: rgba(212, 175, 55, 0.7);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Subtle gold pulse animation */
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+.animate-radar-ring {
+  animation: radar-pulse 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-radar-ring-delay {
+  animation: radar-pulse 3s cubic-bezier(0, 0, 0.2, 1) infinite 1.5s;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #050811;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2010;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}

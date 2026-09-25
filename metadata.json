@@ -1,0 +1,6 @@
+{
+  "name": "Trend Dela - Site Oficial & Radar VIP de Ofertas",
+  "description": "Achados selecionados, descobertas que encantam. Plataforma oficial da Trend Dela com os melhores produtos e ofertas exclusivas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
