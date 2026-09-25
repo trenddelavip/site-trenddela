@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AppConfig, DEFAULT_CONFIG } from '../data/config';
-import { X, Check, Copy, Link as LinkIcon, Sparkles, MessageCircle, RefreshCw, Lock, KeyRound, ShieldCheck, Eye, EyeOff, LogOut, Image, Plus, Trash2 } from 'lucide-react';
+import { X, Check, Copy, Link as LinkIcon, Sparkles, MessageCircle, RefreshCw, Lock, KeyRound, ShieldCheck, Eye, EyeOff, LogOut, Image, Plus, Trash2, Users, FileSpreadsheet, Search } from 'lucide-react';
 
 interface LinkConfigModalProps {
   isOpen: boolean;
@@ -9,6 +9,14 @@ interface LinkConfigModalProps {
   onSaveConfig: (newConfig: AppConfig) => void;
   onResetDefaults: () => void;
   onTestVipPopup?: () => void;
+}
+
+interface LeadItem {
+  name: string;
+  email: string;
+  whatsapp: string;
+  consentDate: string;
+  source?: string;
 }
 
 export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
@@ -36,6 +44,10 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
 
+  // Estado de Leads Capturados
+  const [leadsList, setLeadsList] = useState<LeadItem[]>([]);
+  const [leadSearchTerm, setLeadSearchTerm] = useState('');
+
   useEffect(() => {
     setFormData({
       ...config,
@@ -43,7 +55,49 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
         ? config.heroImages
         : (DEFAULT_CONFIG.heroImages || []),
     });
-  }, [config, isOpen]);
+
+    if (isOpen && isAuthenticated) {
+      try {
+        const saved = JSON.parse(localStorage.getItem('trenddela_leads') || '[]');
+        setLeadsList(saved);
+      } catch (e) {
+        console.warn('Erro ao carregar leads:', e);
+      }
+    }
+  }, [config, isOpen, isAuthenticated]);
+
+  const handleExportLeadsCSV = () => {
+    if (leadsList.length === 0) {
+      alert('Nenhum lead cadastrado ainda para exportar.');
+      return;
+    }
+
+    const headers = ['Nome', 'E-mail', 'WhatsApp', 'Data de Cadastro', 'Origem'];
+    const rows = leadsList.map(l => [
+      `"${l.name.replace(/"/g, '""')}"`,
+      `"${l.email.replace(/"/g, '""')}"`,
+      `"${l.whatsapp}"`,
+      `"${new Date(l.consentDate).toLocaleString('pt-BR')}"`,
+      `"${l.source || 'Formulário do Site'}"`,
+    ]);
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `leads_trenddela_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleClearLeads = () => {
+    if (confirm('Tem certeza que deseja limpar a lista de leads cadastrados? Recomendamos exportar para Excel antes.')) {
+      localStorage.removeItem('trenddela_leads');
+      setLeadsList([]);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -476,6 +530,113 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
                 />
               </div>
             </div>
+          </div>
+
+          {/* SEÇÃO: LEADS E CONTATOS CAPTURADOS */}
+          <div className="p-4 rounded-2xl bg-[#091126] border-2 border-emerald-500/40 text-left space-y-3 shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-500/20 pb-2.5">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-400" />
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+                    Leads & Contatos Capturados
+                  </h4>
+                  <p className="text-[10px] text-slate-400">
+                    Clientes que preencheram o formulário "Receber Novidades" no site.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-extrabold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 rounded-full">
+                  {leadsList.length} contato(s)
+                </span>
+                <button
+                  type="button"
+                  onClick={handleExportLeadsCSV}
+                  disabled={leadsList.length === 0}
+                  className="gold-button-gradient px-3.5 py-1.5 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>Exportar Excel (CSV)</span>
+                </button>
+              </div>
+            </div>
+
+            {leadsList.length > 0 && (
+              <div className="pt-1 space-y-2">
+                {/* Campo de Busca de Leads */}
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={leadSearchTerm}
+                    onChange={(e) => setLeadSearchTerm(e.target.value)}
+                    placeholder="Buscar lead por nome, e-mail ou WhatsApp..."
+                    className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#050811] border border-slate-700 text-white text-xs focus:border-emerald-400 focus:outline-none"
+                  />
+                </div>
+
+                {/* Tabela de Leads */}
+                <div className="max-h-52 overflow-y-auto rounded-xl border border-slate-800 bg-[#050811]">
+                  <table className="w-full text-left text-xs text-slate-300">
+                    <thead className="bg-[#0b1328] text-[10px] uppercase font-bold text-emerald-300 sticky top-0 border-b border-slate-800">
+                      <tr>
+                        <th className="p-2.5">Nome</th>
+                        <th className="p-2.5">E-mail</th>
+                        <th className="p-2.5">WhatsApp</th>
+                        <th className="p-2.5 text-right">Data</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+                      {leadsList
+                        .filter((l) =>
+                          `${l.name} ${l.email} ${l.whatsapp}`
+                            .toLowerCase()
+                            .includes(leadSearchTerm.toLowerCase())
+                        )
+                        .map((lead, idx) => (
+                          <tr key={idx} className="hover:bg-slate-900/60 transition-colors">
+                            <td className="p-2.5 font-sans font-semibold text-white">{lead.name}</td>
+                            <td className="p-2.5 text-slate-300">{lead.email}</td>
+                            <td className="p-2.5">
+                              <a
+                                href={`https://wa.me/55${lead.whatsapp.replace(/\D/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-emerald-400 hover:underline font-bold flex items-center gap-1"
+                                title="Abrir conversa no WhatsApp"
+                              >
+                                <span>{lead.whatsapp}</span>
+                              </a>
+                            </td>
+                            <td className="p-2.5 text-right text-slate-400 text-[10px]">
+                              {new Date(lead.consentDate).toLocaleDateString('pt-BR')}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
+                  <span>💡 Clique sobre o número do WhatsApp para iniciar a conversa direto no WhatsApp.</span>
+                  <button
+                    type="button"
+                    onClick={handleClearLeads}
+                    className="text-red-400 hover:underline cursor-pointer"
+                  >
+                    Limpar lista
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {leadsList.length === 0 && (
+              <p className="text-xs text-slate-400 text-center py-3 italic">
+                Nenhum cliente cadastrado ainda. Os novos contatos aparecerão aqui automaticamente.
+              </p>
+            )}
           </div>
 
           {/* WEBHOOK URL DO FORMULÁRIO DE NOVIDADES */}

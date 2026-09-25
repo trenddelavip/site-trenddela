@@ -84,25 +84,24 @@ export const NewsletterModal: React.FC<NewsletterModalProps> = ({
      * `src/data/config.ts` no campo `newsletterWebhookUrl`.
      */
     try {
-      if (webhookUrl && webhookUrl.trim() !== '') {
-        // Envio real para o serviço configurado
-        const response = await fetch(webhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(leadData),
-        });
+      // 1. Sempre salva no painel local (localStorage) para nunca perder nenhum cadastro
+      const existingLeads = JSON.parse(localStorage.getItem('trenddela_leads') || '[]');
+      existingLeads.unshift(leadData);
+      localStorage.setItem('trenddela_leads', JSON.stringify(existingLeads));
 
-        if (!response.ok) {
-          throw new Error('Falha no envio para o serviço de automação.');
+      // 2. Se houver Webhook (Google Sheets, Make, Zapier, RD Station), envia em paralelo
+      if (webhookUrl && webhookUrl.trim() !== '') {
+        try {
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(leadData),
+          });
+        } catch (webhookErr) {
+          console.warn('Aviso: Webhook não respondeu, mas o lead foi salvo com sucesso no painel local:', webhookErr);
         }
-      } else {
-        // Se ainda não foi conectado um webhook externo:
-        // Armazena no localStorage do navegador para não perder o contato do usuário durante os testes
-        const existingLeads = JSON.parse(localStorage.getItem('trenddela_leads') || '[]');
-        existingLeads.push(leadData);
-        localStorage.setItem('trenddela_leads', JSON.stringify(existingLeads));
       }
 
       setSuccess(true);
