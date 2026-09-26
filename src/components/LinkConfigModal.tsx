@@ -106,10 +106,9 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
     }
   }, [config, isOpen, isAuthenticated]);
 
-  const handleExportLeadsCSV = () => {
-    const targetList = showAllHistory ? allLeadsList : (leadsList.length > 0 ? leadsList : allLeadsList);
+  const handleExportCSV = (targetList: LeadItem[], typeName: string) => {
     if (targetList.length === 0) {
-      alert('Nenhum lead cadastrado ainda para exportar.');
+      alert('Nenhum lead encontrado para exportar.');
       return;
     }
 
@@ -127,10 +126,19 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `leads_trenddela_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `leads_trenddela_${typeName}_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleExportVisibleLeadsCSV = () => {
+    const listToExport = showAllHistory ? allLeadsList : leadsList;
+    handleExportCSV(listToExport, 'painel_visivel');
+  };
+
+  const handleExportAllLeadsCSV = () => {
+    handleExportCSV(allLeadsList, 'historico_completo_supabase');
   };
 
   const handleClearLeadsView = () => {
@@ -683,18 +691,33 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-extrabold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 rounded-full">
                   {(showAllHistory ? allLeadsList : leadsList).length} contato(s)
                 </span>
+
+                {/* Botão 1: Exportar apenas os contatos da lista visível */}
                 <button
                   type="button"
-                  onClick={handleExportLeadsCSV}
-                  disabled={allLeadsList.length === 0}
-                  className="gold-button-gradient px-3.5 py-1.5 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={handleExportVisibleLeadsCSV}
+                  disabled={(showAllHistory ? allLeadsList : leadsList).length === 0}
+                  className="px-3 py-1.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  title="Exportar apenas os contatos visíveis nesta lista"
                 >
-                  <FileSpreadsheet className="w-4 h-4" />
-                  <span>Exportar Excel (CSV)</span>
+                  <FileSpreadsheet className="w-3.5 h-3.5" />
+                  <span>Exportar Esta Lista ({ (showAllHistory ? allLeadsList : leadsList).length })</span>
+                </button>
+
+                {/* Botão 2: Exportar histórico completo salvo no Supabase */}
+                <button
+                  type="button"
+                  onClick={handleExportAllLeadsCSV}
+                  disabled={allLeadsList.length === 0}
+                  className="gold-button-gradient px-3.5 py-1.5 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  title="Exportar 100% de todos os contatos já salvos no Supabase"
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5" />
+                  <span>Exportar Todos ({ allLeadsList.length })</span>
                 </button>
               </div>
             </div>
