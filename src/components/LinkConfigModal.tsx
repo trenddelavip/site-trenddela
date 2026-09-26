@@ -352,6 +352,16 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
               Você pode fazer <strong>upload direto da foto do seu Celular/PC</strong> (armazenado com segurança no Supabase Storage) ou colar um link público.
             </p>
 
+            {/* Dica de Tamanho e Dimensão Ideal */}
+            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-[10px] text-amber-200 leading-relaxed space-y-1">
+              <div>
+                📐 <strong>Dimensão/Proporção Ideal:</strong> Vertical <strong>3:4</strong> (Retrato).
+              </div>
+              <div>
+                🖼️ <strong>Tamanho em Pixels Recomendado:</strong> <strong>1200 x 1600 px</strong> (ou mínimo de 900 x 1200 px). Formatos: JPG, PNG ou WEBP.
+              </div>
+            </div>
+
             {uploadError && (
               <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-[11px] text-red-300">
                 ⚠️ {uploadError}
