@@ -33,6 +33,9 @@ export interface AppConfig {
     magalu: string;
     mercadolivre: string;
     tiktokshop: string;
+    shein: string;
+    temu: string;
+    aliexpress: string;
   };
 
   // INTEGRAÇÃO DO FORMULÁRIO DE NOVIDADES (RODAPÉ)
@@ -68,6 +71,9 @@ export const DEFAULT_CONFIG: AppConfig = {
     magalu: "https://magazineluiza.com.br",
     mercadolivre: "https://mercadolivre.com.br",
     tiktokshop: "https://tiktok.com",
+    shein: "https://shein.com.br",
+    temu: "https://temu.com",
+    aliexpress: "https://pt.aliexpress.com",
   },
 
   // 👉 WEBHOOK OPCIONAL PARA CAPTURA DE LEADS (ex: Zapier, Make, n8n, RD Station):

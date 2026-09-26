@@ -29,6 +29,10 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<AppConfig>(() => ({
     ...config,
+    platformLinks: {
+      ...DEFAULT_CONFIG.platformLinks,
+      ...config.platformLinks,
+    },
     heroImages: (config.heroImages && config.heroImages.length > 0)
       ? config.heroImages
       : (DEFAULT_CONFIG.heroImages || []),
@@ -51,6 +55,10 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
   useEffect(() => {
     setFormData({
       ...config,
+      platformLinks: {
+        ...DEFAULT_CONFIG.platformLinks,
+        ...config.platformLinks,
+      },
       heroImages: (config.heroImages && config.heroImages.length > 0)
         ? config.heroImages
         : (DEFAULT_CONFIG.heroImages || []),
@@ -513,7 +521,7 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label className="text-[11px] text-slate-400 uppercase font-medium block mb-1">
                   TikTok Shop
                 </label>
@@ -524,6 +532,57 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
                     setFormData({
                       ...formData,
                       platformLinks: { ...formData.platformLinks, tiktokshop: e.target.value },
+                    })
+                  }
+                  className="w-full px-3 py-2 rounded-xl bg-[#0e162d] border border-slate-700 text-white text-xs focus:border-amber-400 focus:outline-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] text-slate-400 uppercase font-medium block mb-1">
+                  Shein
+                </label>
+                <input
+                  type="text"
+                  value={formData.platformLinks.shein || ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      platformLinks: { ...formData.platformLinks, shein: e.target.value },
+                    })
+                  }
+                  className="w-full px-3 py-2 rounded-xl bg-[#0e162d] border border-slate-700 text-white text-xs focus:border-amber-400 focus:outline-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] text-slate-400 uppercase font-medium block mb-1">
+                  Temu
+                </label>
+                <input
+                  type="text"
+                  value={formData.platformLinks.temu || ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      platformLinks: { ...formData.platformLinks, temu: e.target.value },
+                    })
+                  }
+                  className="w-full px-3 py-2 rounded-xl bg-[#0e162d] border border-slate-700 text-white text-xs focus:border-amber-400 focus:outline-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] text-slate-400 uppercase font-medium block mb-1">
+                  AliExpress
+                </label>
+                <input
+                  type="text"
+                  value={formData.platformLinks.aliexpress || ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      platformLinks: { ...formData.platformLinks, aliexpress: e.target.value },
                     })
                   }
                   className="w-full px-3 py-2 rounded-xl bg-[#0e162d] border border-slate-700 text-white text-xs focus:border-amber-400 focus:outline-none font-mono"
