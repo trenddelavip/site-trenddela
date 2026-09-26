@@ -43,8 +43,13 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
   const [passwordError, setPasswordError] = useState(false);
 
   // Estado de Leads Capturados
+  const [allLeadsList, setAllLeadsList] = useState<LeadItem[]>([]);
   const [leadsList, setLeadsList] = useState<LeadItem[]>([]);
   const [leadSearchTerm, setLeadSearchTerm] = useState('');
+  const [showAllHistory, setShowAllHistory] = useState(false);
+  const [clearedAt, setClearedAt] = useState<string | null>(() => {
+    return localStorage.getItem('trenddela_leads_cleared_at');
+  });
 
   // Estado de Upload de Imagens no Supabase Storage
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
@@ -86,7 +91,15 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
 
     if (isOpen && isAuthenticated) {
       fetchLeads().then((list) => {
-        setLeadsList(list);
+        setAllLeadsList(list);
+        const savedClearedAt = localStorage.getItem('trenddela_leads_cleared_at');
+        if (savedClearedAt) {
+          const clearedTime = new Date(savedClearedAt).getTime();
+          const filtered = list.filter((l) => new Date(l.consentDate).getTime() > clearedTime);
+          setLeadsList(filtered);
+        } else {
+          setLeadsList(list);
+        }
       }).catch((e) => {
         console.warn('Erro ao carregar leads:', e);
       });
@@ -94,13 +107,14 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
   }, [config, isOpen, isAuthenticated]);
 
   const handleExportLeadsCSV = () => {
-    if (leadsList.length === 0) {
+    const targetList = showAllHistory ? allLeadsList : (leadsList.length > 0 ? leadsList : allLeadsList);
+    if (targetList.length === 0) {
       alert('Nenhum lead cadastrado ainda para exportar.');
       return;
     }
 
     const headers = ['Nome', 'E-mail', 'WhatsApp', 'Data de Cadastro', 'Origem'];
-    const rows = leadsList.map(l => [
+    const rows = targetList.map(l => [
       `"${l.name.replace(/"/g, '""')}"`,
       `"${l.email.replace(/"/g, '""')}"`,
       `"${l.whatsapp}"`,
@@ -119,11 +133,21 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
     document.body.removeChild(link);
   };
 
-  const handleClearLeads = () => {
-    if (confirm('Tem certeza que deseja limpar a lista de leads cadastrados? Recomendamos exportar para Excel antes.')) {
-      localStorage.removeItem('trenddela_leads');
+  const handleClearLeadsView = () => {
+    if (confirm('Deseja limpar a visualização dos contatos no Painel do Administrador?\n\nNota: Todos os contatos continuarão 100% salvos e preservados no banco de dados Supabase.')) {
+      const nowStr = new Date().toISOString();
+      localStorage.setItem('trenddela_leads_cleared_at', nowStr);
+      setClearedAt(nowStr);
       setLeadsList([]);
+      setShowAllHistory(false);
     }
+  };
+
+  const handleRestoreLeadsView = () => {
+    localStorage.removeItem('trenddela_leads_cleared_at');
+    setClearedAt(null);
+    setLeadsList(allLeadsList);
+    setShowAllHistory(false);
   };
 
   if (!isOpen) return null;
@@ -654,19 +678,19 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
                     Leads & Contatos Capturados
                   </h4>
                   <p className="text-[10px] text-slate-400">
-                    Clientes que preencheram o formulário "Receber Novidades" no site.
+                    Clientes que preencheram o formulário no site. (Preservados 100% no Supabase)
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="text-xs font-extrabold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 rounded-full">
-                  {leadsList.length} contato(s)
+                  {(showAllHistory ? allLeadsList : leadsList).length} contato(s)
                 </span>
                 <button
                   type="button"
                   onClick={handleExportLeadsCSV}
-                  disabled={leadsList.length === 0}
+                  disabled={allLeadsList.length === 0}
                   className="gold-button-gradient px-3.5 py-1.5 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <FileSpreadsheet className="w-4 h-4" />
@@ -675,7 +699,7 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
               </div>
             </div>
 
-            {leadsList.length > 0 && (
+            {((showAllHistory ? allLeadsList : leadsList).length > 0) ? (
               <div className="pt-1 space-y-2">
                 {/* Campo de Busca de Leads */}
                 <div className="relative">
@@ -701,7 +725,7 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
-                      {leadsList
+                      {(showAllHistory ? allLeadsList : leadsList)
                         .filter((l) =>
                           `${l.name} ${l.email} ${l.whatsapp}`
                             .toLowerCase()
@@ -731,23 +755,66 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
                   </table>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400 pt-1 border-t border-slate-800/60">
                   <span>💡 Clique sobre o número do WhatsApp para iniciar a conversa direto no WhatsApp.</span>
-                  <button
-                    type="button"
-                    onClick={handleClearLeads}
-                    className="text-red-400 hover:underline cursor-pointer"
-                  >
-                    Limpar lista
-                  </button>
+                  
+                  <div className="flex items-center gap-3">
+                    {clearedAt && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllHistory(!showAllHistory)}
+                        className="text-amber-300 hover:underline cursor-pointer font-semibold"
+                      >
+                        {showAllHistory ? '👁️ Ocultar Histórico Antigo' : `👁️ Ver Histórico Completo no Supabase (${allLeadsList.length})`}
+                      </button>
+                    )}
+
+                    {clearedAt && (
+                      <button
+                        type="button"
+                        onClick={handleRestoreLeadsView}
+                        className="text-emerald-400 hover:underline cursor-pointer font-semibold"
+                      >
+                        Restaurar visualização
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleClearLeadsView}
+                      className="text-red-400 hover:underline cursor-pointer font-semibold"
+                    >
+                      Limpar lista do painel
+                    </button>
+                  </div>
                 </div>
               </div>
-            )}
-
-            {leadsList.length === 0 && (
-              <p className="text-xs text-slate-400 text-center py-3 italic">
-                Nenhum cliente cadastrado ainda. Os novos contatos aparecerão aqui automaticamente.
-              </p>
+            ) : (
+              <div className="py-4 text-center space-y-2">
+                <p className="text-xs text-slate-400 italic">
+                  {clearedAt
+                    ? 'A visualização do painel foi limpa. Novos clientes que se cadastrarem aparecerão aqui automaticamente.'
+                    : 'Nenhum cliente cadastrado ainda. Os novos contatos aparecerão aqui automaticamente.'}
+                </p>
+                {clearedAt && (
+                  <div className="flex items-center justify-center gap-3 text-xs pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowAllHistory(true)}
+                      className="text-amber-300 hover:underline cursor-pointer font-semibold"
+                    >
+                      👁️ Ver Histórico Completo do Supabase ({allLeadsList.length} contato(s))
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRestoreLeadsView}
+                      className="text-emerald-400 hover:underline cursor-pointer font-semibold"
+                    >
+                      Restaurar visualização original
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
