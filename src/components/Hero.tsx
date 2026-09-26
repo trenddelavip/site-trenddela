@@ -193,6 +193,10 @@ export const Hero: React.FC<HeroProps> = ({ whatsappGroupUrl, onOpenHowItWorks, 
                       key={imgSrc + idx}
                       src={imgSrc}
                       alt={`Destaque Trend Dela ${idx + 1}`}
+                      onError={(e) => {
+                        // Fallback gracioso para evitar imagem quebrada na tela
+                        (e.target as HTMLImageElement).src = defaultImages[idx % defaultImages.length];
+                      }}
                       className={`absolute inset-0 w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.05] transition-opacity duration-1000 ease-in-out ${
                         idx === currentIndex ? 'opacity-100 z-0' : 'opacity-0 -z-10'
                       }`}
