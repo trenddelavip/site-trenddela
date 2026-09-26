@@ -24,7 +24,7 @@ export const PlatformsSection: React.FC<PlatformsSectionProps> = ({ platformLink
       badge: 'Frete & Cupons',
       tagline: 'Achadinhos Virais',
       logo: (
-        <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="100" height="100" rx="22" fill="#EE4D2D" />
           <path d="M50 22C41.2 22 34 29.2 34 38V42H26C23.8 42 22 43.8 22 46L24.5 74C24.7 76.2 26.5 78 28.7 78H71.3C73.5 78 75.3 76.2 75.5 74L78 46C78 43.8 76.2 42 74 42H66V38C66 29.2 58.8 22 50 22ZM41 38C41 33 45 29 50 29C55 29 59 33 59 38V42H41V38Z" fill="white" />
           <path d="M50 50C44.5 50 40 53.5 40 58C40 64.5 59.5 63 59.5 68.5C59.5 71 55.5 72.5 50 72.5C43.5 72.5 40 69.5 39 67.5" stroke="white" strokeWidth="4.5" strokeLinecap="round" />
@@ -39,11 +39,12 @@ export const PlatformsSection: React.FC<PlatformsSectionProps> = ({ platformLink
       badge: 'Entrega Rápida',
       tagline: 'Eletrônicos & Casa',
       logo: (
-        <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100" height="100" rx="22" fill="#131921" />
-          <path d="M68 62C52 74 28 73 18 64C17 63 18 61.5 19.5 62C30 67 52 68.5 66 59.5C67.5 58.5 69 60.5 68 62Z" fill="#FF9900" />
-          <path d="M73 57.5C71 56 65 56.5 62 57C61 57.2 61 56.4 61.5 56C64 54 73.5 52 75 54.5C76 56.5 72 65 69.5 67.5C69 68 68.3 67.5 68.6 66.8C69.5 64.5 74.5 59 73 57.5Z" fill="#FF9900" />
-          <path d="M45.5 46.5C45.5 51.5 42 54.5 37.5 54.5C32.5 54.5 29.5 51 29.5 46.5C29.5 38 45.5 39.5 45.5 34C45.5 31.5 43 29.5 38.5 29.5C34.5 29.5 31 31 29 32.5C28.3 33 27.5 32 28.2 31.2C30.5 29 34.5 27 39 27C45.5 27 49.5 30.5 49.5 35.5V53C49.5 55 50.5 55.5 51.5 55.5C52 55.5 52.5 55.2 52.8 54.8C53.3 55.6 52.5 57 50 57C47 57 45.5 55 45.5 53V46.5ZM45.5 43C42 43 33.5 43.5 33.5 47C33.5 49.5 35.5 51 38 51C42 51 45.5 48.5 45.5 43Z" fill="white" />
+        <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="100" rx="22" fill="#FFFFFF" />
+          {/* Logo Amazon idêntico à Foto 4 enviada pelo usuário */}
+          <text x="50%" y="42%" dominantBaseline="middle" textAnchor="middle" fill="#141920" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="21" letterSpacing="-0.5">amazon</text>
+          <path d="M28 60C40 68 60 68 70 59" stroke="#FF9900" strokeWidth="5.5" strokeLinecap="round" />
+          <path d="M66 56L73 60L67 65" fill="#FF9900" />
         </svg>
       ),
     },
@@ -55,10 +56,20 @@ export const PlatformsSection: React.FC<PlatformsSectionProps> = ({ platformLink
       badge: 'Confiança Nacional',
       tagline: 'Eletro & Decoração',
       logo: (
-        <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="100" height="100" rx="22" fill="#0086FF" />
-          <path d="M26 68V32H34L45 54L56 32H64V68H56V46L47.5 63H42.5L34 46V68H26Z" fill="white" />
-          <circle cx="74" cy="63" r="5" fill="#00E5FF" />
+          {/* Logo Magalu com sublinhado arco-íris idêntico à Foto 3 enviada pelo usuário */}
+          <text x="50%" y="46%" dominantBaseline="middle" textAnchor="middle" fill="#FFFFFF" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="21" letterSpacing="-0.5">magalu</text>
+          <defs>
+            <linearGradient id="magaluRainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FFCC00" />
+              <stop offset="25%" stopColor="#FF3366" />
+              <stop offset="50%" stopColor="#CC33FF" />
+              <stop offset="75%" stopColor="#00CCFF" />
+              <stop offset="100%" stopColor="#00FF66" />
+            </linearGradient>
+          </defs>
+          <rect x="20" y="64" width="60" height="5" rx="2.5" fill="url(#magaluRainbow)" />
         </svg>
       ),
     },
@@ -70,11 +81,13 @@ export const PlatformsSection: React.FC<PlatformsSectionProps> = ({ platformLink
       badge: 'Compra Garantida',
       tagline: 'Variedade Total',
       logo: (
-        <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="100" height="100" rx="22" fill="#FFE600" />
-          {/* Logo Original Aperto de Mão do Mercado Livre */}
-          <path d="M50 20C33.4 20 20 33.4 20 50C20 66.6 33.4 80 50 80C66.6 80 80 66.6 80 50C80 33.4 66.6 20 50 20ZM64 43.5L54.5 53C53.5 54 52 54.5 50.5 54.5C49 54.5 47.5 54 46.5 53L43.5 50L40 53.5C39 54.5 37.5 55 36 55C34.5 55 33 54.5 32 53.5L30 51.5C29 50.5 29 49 30 48L37.5 40.5C38.5 39.5 40 39 41.5 39C43 39 44.5 39.5 45.5 40.5L47.5 42.5L52.5 37.5C53.5 36.5 55 36 56.5 36C58 36 59.5 36.5 60.5 37.5L64 41C64.8 41.8 64.8 42.7 64 43.5Z" fill="#2D3277" />
-          <path d="M38 46L43 51L47 47L42 42C41 41 39 41 38 42L36 44C35 45 35 46 36 47L38 46Z" fill="#2D3277" />
+          {/* Logo Aperto de Mão Oval do Mercado Livre idêntico à Foto 1 enviada pelo usuário */}
+          <ellipse cx="50" cy="50" rx="38" ry="24" fill="#FFE600" stroke="#1E2565" strokeWidth="6" />
+          <path d="M22 47C30 45 42 35 50 35C58 35 70 45 78 47V53C70 51 58 65 50 65C42 65 30 51 22 53V47Z" fill="white" stroke="#1E2565" strokeWidth="4.5" />
+          <path d="M39 37C44 32 56 32 61 37L50 48L39 37Z" stroke="#1E2565" strokeWidth="4.5" strokeLinejoin="round" fill="white" />
+          <path d="M33 50C36 55 43 58 50 58C57 58 64 55 67 50" stroke="#1E2565" strokeWidth="4.5" strokeLinecap="round" />
         </svg>
       ),
     },
@@ -86,7 +99,7 @@ export const PlatformsSection: React.FC<PlatformsSectionProps> = ({ platformLink
       badge: 'Tendências Virais',
       tagline: 'Vídeos & Achados',
       logo: (
-        <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="100" height="100" rx="22" fill="#000000" />
           <path d="M68 40.5A18 18 0 0 1 54 26V60A18 18 0 1 1 36 42V51A9 9 0 1 0 45 60V20H54A18 18 0 0 0 68 31.5V40.5Z" fill="#25F4EE" />
           <path d="M65 37.5A18 18 0 0 1 51 23V57A18 18 0 1 1 33 39V48A9 9 0 1 0 42 57V17H51A18 18 0 0 0 65 28.5V37.5Z" fill="#FE2C55" />
@@ -102,9 +115,9 @@ export const PlatformsSection: React.FC<PlatformsSectionProps> = ({ platformLink
       badge: 'Moda & Tendência',
       tagline: 'Look do Momento',
       logo: (
-        <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="100" height="100" rx="22" fill="#000000" />
-          <rect x="3" y="3" width="94" height="94" rx="19" stroke="#444444" strokeWidth="2" />
+          <rect x="4" y="4" width="92" height="92" rx="18" stroke="#444444" strokeWidth="2.5" />
           <text x="50%" y="58%" dominantBaseline="middle" textAnchor="middle" fill="#FFFFFF" fontFamily="system-ui, sans-serif" fontWeight="900" fontSize="21" letterSpacing="1.5">SHEIN</text>
         </svg>
       ),
@@ -117,7 +130,7 @@ export const PlatformsSection: React.FC<PlatformsSectionProps> = ({ platformLink
       badge: 'Super Ofertas',
       tagline: 'Preços Inacreditáveis',
       logo: (
-        <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="100" height="100" rx="22" fill="#FB7701" />
           <text x="50%" y="42%" dominantBaseline="middle" textAnchor="middle" fill="#FFFFFF" fontFamily="system-ui, sans-serif" fontWeight="900" fontSize="23" letterSpacing="1">TEMU</text>
           <path d="M28 66C28 62 33 60 38 60C43 60 48 62 48 66" stroke="white" strokeWidth="3" strokeLinecap="round" />
@@ -129,14 +142,15 @@ export const PlatformsSection: React.FC<PlatformsSectionProps> = ({ platformLink
       id: 'aliexpress',
       name: 'AliExpress',
       url: platformLinks.aliexpress || 'https://pt.aliexpress.com',
-      color: '#FF4747',
+      color: '#E61C43',
       badge: 'Importados Diretos',
       tagline: 'Gadgets & Variedades',
       logo: (
-        <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100" height="100" rx="22" fill="#FF4747" />
-          <path d="M25 68L44 32H56L75 68H63L59 59H41L37 68H25ZM45 49H55L50 38L45 49Z" fill="white" />
-          <circle cx="76" cy="34" r="6" fill="#FFE600" />
+        <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="100" rx="22" fill="#E61C43" />
+          {/* Sacola vermelha com Check V Amarelo idêntico à Foto 2 enviada pelo usuário */}
+          <path d="M34 26C34 18 41 13 50 13C59 13 66 18 66 26V28H76C78.2 28 80 29.8 80 32L76 82C76 84.2 74.2 86 72 86H28C25.8 86 24 84.2 24 82L20 32C20 29.8 21.8 28 24 28H34V26ZM41 28H59V26C59 21 55 19 50 19C45 19 41 21 41 26V28Z" stroke="white" strokeWidth="5.5" strokeLinejoin="round" fill="none" />
+          <path d="M22 51L42 71L82 47" stroke="#FFBA00" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       ),
     },
