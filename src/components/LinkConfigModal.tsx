@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AppConfig, DEFAULT_CONFIG, LeadItem } from '../data/config';
-import { fetchLeads } from '../services/supabaseService';
-import { X, Check, Copy, Link as LinkIcon, Sparkles, MessageCircle, RefreshCw, Lock, KeyRound, ShieldCheck, Eye, EyeOff, LogOut, Image, Plus, Trash2, Users, FileSpreadsheet, Search } from 'lucide-react';
+import { fetchLeads, uploadHeroImage, deleteHeroImage } from '../services/supabaseService';
+import { X, Check, Copy, Link as LinkIcon, Sparkles, MessageCircle, RefreshCw, Lock, KeyRound, ShieldCheck, Eye, EyeOff, LogOut, Image, Plus, Trash2, Users, FileSpreadsheet, Search, Upload, Loader2 } from 'lucide-react';
+
 
 interface LinkConfigModalProps {
   isOpen: boolean;
@@ -44,6 +45,32 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
   // Estado de Leads Capturados
   const [leadsList, setLeadsList] = useState<LeadItem[]>([]);
   const [leadSearchTerm, setLeadSearchTerm] = useState('');
+
+  // Estado de Upload de Imagens no Supabase Storage
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingIndex(index);
+    setUploadError(null);
+
+    const result = await uploadHeroImage(file);
+
+    if (result.success && result.publicUrl) {
+      const newImages = [...(formData.heroImages || [])];
+      newImages[index] = result.publicUrl;
+      setFormData({ ...formData, heroImages: newImages });
+    } else if (result.error) {
+      setUploadError(result.error);
+    }
+
+    setUploadingIndex(null);
+    e.target.value = '';
+  };
+
 
   useEffect(() => {
     setFormData({
@@ -322,13 +349,14 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
             </div>
             
             <p className="text-[11px] text-slate-300 leading-relaxed">
-              Adicione links diretos de imagens (incluindo <strong>Google Fotos</strong>, Unsplash ou URLs de imagens hospedadas). O carrossel alternará automaticamente entre essas imagens.
+              Você pode fazer <strong>upload direto da foto do seu Celular/PC</strong> (armazenado com segurança no Supabase Storage) ou colar um link público.
             </p>
 
-            {/* Dica para Google Fotos */}
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[10px] text-amber-200 leading-normal">
-              💡 <strong>Como usar links do Google Fotos:</strong> No Google Fotos, abra a foto desejada, clique com o botão direito sobre ela e escolha <em>"Copiar endereço da imagem"</em>. Cole o link no campo abaixo.
-            </div>
+            {uploadError && (
+              <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-[11px] text-red-300">
+                ⚠️ {uploadError}
+              </div>
+            )}
 
             <div className="space-y-2 pt-1">
               {(formData.heroImages || []).map((imgUrl, index) => (
@@ -344,18 +372,41 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
                       newImages[index] = e.target.value;
                       setFormData({ ...formData, heroImages: newImages });
                     }}
-                    placeholder="https://images.unsplash.com/... ou link direto do Google Fotos"
-                    className="flex-1 px-3 py-2 rounded-xl bg-[#050811] border border-slate-700 text-white text-xs font-mono focus:border-amber-400 focus:outline-none font-mono"
+                    placeholder="Cole a URL ou clique no botão Upload ao lado"
+                    className="flex-1 px-3 py-2 rounded-xl bg-[#050811] border border-slate-700 text-white text-xs font-mono focus:border-amber-400 focus:outline-none"
                   />
+                  
+                  {/* Botão de Upload do Celular / PC */}
+                  <label className="p-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/50 text-amber-300 transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer shrink-0">
+                    {uploadingIndex === index ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                    ) : (
+                      <Upload className="w-3.5 h-3.5" />
+                    )}
+                    <span className="hidden sm:inline">Upload</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, index)}
+                      disabled={uploadingIndex !== null}
+                    />
+                  </label>
+
+                  {/* Botão Excluir Foto */}
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
+                      const targetUrl = formData.heroImages?.[index];
+                      if (targetUrl) {
+                        await deleteHeroImage(targetUrl);
+                      }
                       const newImages = (formData.heroImages || []).filter((_, i) => i !== index);
                       setFormData({ ...formData, heroImages: newImages });
                     }}
                     disabled={(formData.heroImages || []).length <= 1}
-                    className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                    title="Remover imagem"
+                    className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                    title="Excluir imagem"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

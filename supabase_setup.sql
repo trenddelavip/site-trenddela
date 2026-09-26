@@ -53,7 +53,27 @@ CREATE POLICY "Permitir insercao de leads"
 ON public.leads FOR INSERT 
 WITH CHECK (true);
 
--- Permitir leitura dos leads pelo painel de admin
-CREATE POLICY "Permitir leitura de leads" 
-ON public.leads FOR SELECT 
-USING (true);
+-- 3. BUCKET DE ARMAZENAMENTO DE IMAGENS DO CARROSSEL (Supabase Storage)
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+    'hero-carousel', 
+    'hero-carousel', 
+    true, 
+    10485760, 
+    ARRAY['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml']::text[]
+)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Políticas de acesso público ao bucket hero-carousel (Leitura, Upload e Deleção)
+CREATE POLICY "Leitura Publica Hero Storage" 
+ON storage.objects FOR SELECT 
+USING (bucket_id = 'hero-carousel');
+
+CREATE POLICY "Upload Publico Hero Storage" 
+ON storage.objects FOR INSERT 
+WITH CHECK (bucket_id = 'hero-carousel');
+
+CREATE POLICY "Delecao Publica Hero Storage" 
+ON storage.objects FOR DELETE 
+USING (bucket_id = 'hero-carousel');
+

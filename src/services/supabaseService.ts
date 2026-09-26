@@ -164,3 +164,71 @@ export async function fetchLeads(): Promise<LeadItem[]> {
     return [];
   }
 }
+
+/**
+ * Upload de imagem diretamente para o Supabase Storage (Bucket "hero-carousel")
+ */
+export async function uploadHeroImage(file: File): Promise<{ success: boolean; publicUrl?: string; error?: string }> {
+  if (!isSupabaseConfigured || !supabase) {
+    return { success: false, error: 'Supabase não configurado. Verifique as chaves VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY na Vercel.' };
+  }
+
+  try {
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const fileName = `hero_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from('hero-carousel')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+      });
+
+    if (error) {
+      console.error('Erro no upload para o Supabase Storage:', error);
+      if (error.message.includes('not found') || error.message.includes('Bucket')) {
+        return {
+          success: false,
+          error: 'O bucket "hero-carousel" precisa ser criado no Supabase em Storage -> Create Bucket -> "hero-carousel" (público).'
+        };
+      }
+      return { success: false, error: error.message };
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('hero-carousel')
+      .getPublicUrl(filePath);
+
+    return {
+      success: true,
+      publicUrl: publicUrlData.publicUrl,
+    };
+  } catch (e: any) {
+    console.error('Falha no upload:', e);
+    return { success: false, error: e?.message || 'Erro inesperado durante o upload.' };
+  }
+}
+
+/**
+ * Exclui uma imagem do Supabase Storage se pertencer ao bucket hero-carousel
+ */
+export async function deleteHeroImage(publicUrl: string): Promise<{ success: boolean }> {
+  if (!isSupabaseConfigured || !supabase || !publicUrl) {
+    return { success: false };
+  }
+
+  try {
+    if (publicUrl.includes('/storage/v1/object/public/hero-carousel/')) {
+      const fileName = publicUrl.split('/hero-carousel/').pop();
+      if (fileName) {
+        await supabase.storage.from('hero-carousel').remove([fileName]);
+      }
+    }
+  } catch (e) {
+    console.warn('Erro ao excluir foto do Supabase Storage:', e);
+  }
+
+  return { success: true };
+}
+
