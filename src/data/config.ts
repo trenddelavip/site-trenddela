@@ -50,6 +50,15 @@ export interface AppConfig {
   heroImages?: string[];
 }
 
+export interface LeadItem {
+  id?: string;
+  name: string;
+  email: string;
+  whatsapp: string;
+  consentDate: string;
+  source?: string;
+}
+
 export const DEFAULT_CONFIG: AppConfig = {
   // 👉 LINK DO WHATSAPP DOS GRUPOS DO RADAR VIP (Atualizado Oficial)
   whatsappGroupUrl: "https://wa.link/hbznsr",

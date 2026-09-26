@@ -13,27 +13,15 @@ import { ContactModal } from './components/ContactModal';
 import { LinkConfigModal } from './components/LinkConfigModal';
 import { VipPopupModal } from './components/VipPopupModal';
 
+import { fetchAppConfig, saveAppConfig } from './services/supabaseService';
+
 export default function App() {
-  // Estado de configuração com persistência em localStorage para facilitar edição pelo cliente
+  // Estado de configuração
   const [config, setConfig] = useState<AppConfig>(() => {
     try {
       const saved = localStorage.getItem('trenddela_config_v2') || localStorage.getItem('trenddela_config_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Garante que o link oficial do WhatsApp seja atualizado caso esteja com o placeholder antigo
-        if (
-          !parsed.whatsappGroupUrl ||
-          parsed.whatsappGroupUrl.includes('TrendDelaRadarVIP') ||
-          parsed.whatsappGroupUrl.includes('SEU_CODIGO')
-        ) {
-          parsed.whatsappGroupUrl = DEFAULT_CONFIG.whatsappGroupUrl;
-        }
-        if (
-          !parsed.whatsappSupportUrl ||
-          parsed.whatsappSupportUrl.includes('999999999')
-        ) {
-          parsed.whatsappSupportUrl = DEFAULT_CONFIG.whatsappSupportUrl;
-        }
         return { ...DEFAULT_CONFIG, ...parsed };
       }
     } catch (e) {
@@ -41,6 +29,15 @@ export default function App() {
     }
     return DEFAULT_CONFIG;
   });
+
+  // Carregar configurações atualizadas do Supabase ao iniciar
+  useEffect(() => {
+    fetchAppConfig().then((loadedConfig) => {
+      setConfig(loadedConfig);
+    }).catch((err) => {
+      console.warn('Falha ao carregar configuração inicial:', err);
+    });
+  }, []);
 
   // Estados dos Modais
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
@@ -59,17 +56,13 @@ export default function App() {
   }, []);
 
   // Manipulador para salvar configurações atualizadas
-  const handleSaveConfig = (newConfig: AppConfig) => {
+  const handleSaveConfig = async (newConfig: AppConfig) => {
     setConfig(newConfig);
-    try {
-      localStorage.setItem('trenddela_config_v2', JSON.stringify(newConfig));
-    } catch (e) {
-      console.warn('Erro ao persistir configurações:', e);
-    }
+    await saveAppConfig(newConfig);
   };
 
   // Restaurar padrões
-  const handleResetDefaults = () => {
+  const handleResetDefaults = async () => {
     setConfig(DEFAULT_CONFIG);
     try {
       localStorage.removeItem('trenddela_config_v2');
@@ -77,6 +70,7 @@ export default function App() {
     } catch (e) {
       console.warn('Erro ao limpar configurações:', e);
     }
+    await saveAppConfig(DEFAULT_CONFIG);
   };
 
   // Scroll suave para seções

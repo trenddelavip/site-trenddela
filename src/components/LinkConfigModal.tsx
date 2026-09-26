@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { AppConfig, DEFAULT_CONFIG } from '../data/config';
+import { AppConfig, DEFAULT_CONFIG, LeadItem } from '../data/config';
+import { fetchLeads } from '../services/supabaseService';
 import { X, Check, Copy, Link as LinkIcon, Sparkles, MessageCircle, RefreshCw, Lock, KeyRound, ShieldCheck, Eye, EyeOff, LogOut, Image, Plus, Trash2, Users, FileSpreadsheet, Search } from 'lucide-react';
 
 interface LinkConfigModalProps {
@@ -9,14 +10,6 @@ interface LinkConfigModalProps {
   onSaveConfig: (newConfig: AppConfig) => void;
   onResetDefaults: () => void;
   onTestVipPopup?: () => void;
-}
-
-interface LeadItem {
-  name: string;
-  email: string;
-  whatsapp: string;
-  consentDate: string;
-  source?: string;
 }
 
 export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
@@ -65,12 +58,11 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
     });
 
     if (isOpen && isAuthenticated) {
-      try {
-        const saved = JSON.parse(localStorage.getItem('trenddela_leads') || '[]');
-        setLeadsList(saved);
-      } catch (e) {
+      fetchLeads().then((list) => {
+        setLeadsList(list);
+      }).catch((e) => {
         console.warn('Erro ao carregar leads:', e);
-      }
+      });
     }
   }, [config, isOpen, isAuthenticated]);
 

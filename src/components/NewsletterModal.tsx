@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CrownLogo } from './CrownLogo';
+import { saveLead } from '../services/supabaseService';
 import { X, CheckCircle2, ShieldCheck, Mail, User, Phone, AlertCircle, Loader2 } from 'lucide-react';
 
 interface NewsletterModalProps {
@@ -75,19 +76,9 @@ export const NewsletterModal: React.FC<NewsletterModalProps> = ({
       source: 'Rodapé - Botão Receber Novidades',
     };
 
-    /**
-     * =========================================================================
-     * PONTO DE INTEGRAÇÃO OFICIAL DO FORMULÁRIO DE CAPTURA
-     * =========================================================================
-     * Se você tiver uma URL de Webhook ou API (ex: Make, n8n, Zapier, RD Station,
-     * Mailchimp, ActiveCampaign ou Google Sheets), configure em:
-     * `src/data/config.ts` no campo `newsletterWebhookUrl`.
-     */
     try {
-      // 1. Sempre salva no painel local (localStorage) para nunca perder nenhum cadastro
-      const existingLeads = JSON.parse(localStorage.getItem('trenddela_leads') || '[]');
-      existingLeads.unshift(leadData);
-      localStorage.setItem('trenddela_leads', JSON.stringify(existingLeads));
+      // 1. Salva no Supabase e no localStorage através do serviço central
+      await saveLead(leadData);
 
       // 2. Se houver Webhook (Google Sheets, Make, Zapier, RD Station), envia em paralelo
       if (webhookUrl && webhookUrl.trim() !== '') {
@@ -100,7 +91,7 @@ export const NewsletterModal: React.FC<NewsletterModalProps> = ({
             body: JSON.stringify(leadData),
           });
         } catch (webhookErr) {
-          console.warn('Aviso: Webhook não respondeu, mas o lead foi salvo com sucesso no painel local:', webhookErr);
+          console.warn('Aviso: Webhook não respondeu, mas o lead foi salvo com sucesso:', webhookErr);
         }
       }
 
