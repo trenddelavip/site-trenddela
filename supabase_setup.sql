@@ -17,13 +17,16 @@ CREATE TABLE IF NOT EXISTS public.site_config (
 -- Habilitar Row Level Security (RLS)
 ALTER TABLE public.site_config ENABLE ROW LEVEL SECURITY;
 
--- Políticas de acesso para a tabela site_config:
--- Leitura pública (qualquer visitante pode ver as configurações/links)
+-- Remover políticas existentes se houver (para evitar erros ao re-executar)
+DROP POLICY IF EXISTS "Permitir leitura publica das configuracoes" ON public.site_config;
+DROP POLICY IF EXISTS "Permitir atualizacao das configuracoes" ON public.site_config;
+DROP POLICY IF EXISTS "Permitir alteracao das configuracoes" ON public.site_config;
+
+-- Criar políticas de acesso para a tabela site_config:
 CREATE POLICY "Permitir leitura publica das configuracoes" 
 ON public.site_config FOR SELECT 
 USING (true);
 
--- Inserção e Atualização pública/anon (para que o Painel do Admin consiga salvar na nuvem)
 CREATE POLICY "Permitir atualizacao das configuracoes" 
 ON public.site_config FOR INSERT 
 WITH CHECK (true);
@@ -47,11 +50,17 @@ CREATE TABLE IF NOT EXISTS public.leads (
 -- Habilitar Row Level Security (RLS)
 ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
 
--- Políticas de acesso para a tabela leads:
--- Permitir que qualquer visitante envie seus dados (Inserção)
+DROP POLICY IF EXISTS "Permitir insercao de leads" ON public.leads;
+DROP POLICY IF EXISTS "Permitir leitura de leads" ON public.leads;
+
 CREATE POLICY "Permitir insercao de leads" 
 ON public.leads FOR INSERT 
 WITH CHECK (true);
+
+CREATE POLICY "Permitir leitura de leads" 
+ON public.leads FOR SELECT 
+USING (true);
+
 
 -- 3. BUCKET DE ARMAZENAMENTO DE IMAGENS DO CARROSSEL (Supabase Storage)
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -64,7 +73,12 @@ VALUES (
 )
 ON CONFLICT (id) DO UPDATE SET public = true;
 
--- Políticas de acesso público ao bucket hero-carousel (Leitura, Upload e Deleção)
+-- Remover políticas de storage se já existirem
+DROP POLICY IF EXISTS "Leitura Publica Hero Storage" ON storage.objects;
+DROP POLICY IF EXISTS "Upload Publico Hero Storage" ON storage.objects;
+DROP POLICY IF EXISTS "Delecao Publica Hero Storage" ON storage.objects;
+
+-- Criar políticas de acesso público ao bucket hero-carousel (Leitura, Upload e Deleção)
 CREATE POLICY "Leitura Publica Hero Storage" 
 ON storage.objects FOR SELECT 
 USING (bucket_id = 'hero-carousel');
@@ -76,4 +90,3 @@ WITH CHECK (bucket_id = 'hero-carousel');
 CREATE POLICY "Delecao Publica Hero Storage" 
 ON storage.objects FOR DELETE 
 USING (bucket_id = 'hero-carousel');
-
